@@ -1,4 +1,4 @@
-import { CSSProperties, useCallback, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -18,8 +18,8 @@ import { useTitle } from '../../containers/useTitle';
 import { AttributesItems } from '../AttributesItems/AttributesItems';
 import { IService, useDataContainer } from '../../containers/DataContainer/useDataContainer';
 import { buildService } from '../../services/buildService';
-import { DataContainer } from '../../containers/DataContainer/DataContainer';
 import { useInterval } from '../../containers/useInterval';
+import { CardSection } from '../CardSection/CardSection';
 
 const REFRESH_INTERVAL_SECONDS = 90;
 
@@ -42,13 +42,20 @@ export const AdministrationPage = () => {
     setSecondsUntilReload(REFRESH_INTERVAL_SECONDS);
   }, [dataContainerRefresh]);
 
+  useEffect(() => {
+    refreshBuildCounts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const restartInterval = useInterval(
     useCallback(() => {
-      setSecondsUntilReload(secondsUntilReload - 1);
-      if (secondsUntilReload <= 1) {
-        refreshBuildCounts();
+      if (!dataContainer.loading) {
+        setSecondsUntilReload(secondsUntilReload - 1);
+        if (secondsUntilReload <= 1) {
+          refreshBuildCounts();
+        }
       }
-    }, [secondsUntilReload, refreshBuildCounts]),
+    }, [secondsUntilReload, refreshBuildCounts, dataContainer.loading]),
     1000,
     true
   );
@@ -59,63 +66,57 @@ export const AdministrationPage = () => {
     <PageLayout title="Administration" description="Administration tools for admin users">
       <Flex direction={{ default: 'column' }}>
         <FlexItem>
-          <Form isHorizontal>
-            <Card>
-              <CardBody>
-                <Grid hasGutter>
-                  <GridItem span={12}>
-                    <FormGroup label="PNC System Version" fieldId="form-pnc-system-version">
-                      <TextInput type="text" id="form-pnc-system-version" name="form-pnc-system-version" />
-                    </FormGroup>
-                  </GridItem>
-                  <GridItem span={4}>
-                    <Button variant="primary" id="form-pnc-system-version-update" name="form-pnc-system-version-update">
-                      Update
-                    </Button>
-                  </GridItem>
-                </Grid>
-              </CardBody>
-            </Card>
-          </Form>
-        </FlexItem>
-        <FlexItem>
-          <Card>
-            <CardBody>
+          <CardSection>
+            <Form isHorizontal>
               <Grid hasGutter>
                 <GridItem span={12}>
-                  <DataContainer {...dataContainer} title="Builds Count">
-                    <AttributesItems
-                      attributes={[
-                        {
-                          name: 'Running builds count',
-                          value: dataContainer.data?.running,
-                        },
-                        {
-                          name: 'Enqueued builds count',
-                          value: dataContainer.data?.enqueued,
-                        },
-                        {
-                          name: 'Waiting for dependencies builds count',
-                          value: dataContainer.data?.waitingForDependencies,
-                        },
-                      ]}
-                    />
-                  </DataContainer>
+                  <FormGroup label="PNC System Version" fieldId="form-pnc-system-version">
+                    <TextInput type="text" id="form-pnc-system-version" name="form-pnc-system-version" />
+                  </FormGroup>
                 </GridItem>
                 <GridItem span={4}>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      refreshBuildCounts();
-                      restartInterval();
-                    }}
-                  >
-                    Refresh ({secondsUntilReload} s)
+                  <Button variant="primary" id="form-pnc-system-version-update" name="form-pnc-system-version-update">
+                    Update
                   </Button>
                 </GridItem>
               </Grid>
-            </CardBody>
-          </Card>
+            </Form>
+          </CardSection>
+        </FlexItem>
+        <FlexItem>
+          <CardSection dataContainer={dataContainer} title="Builds Count">
+            <Grid hasGutter>
+              <GridItem span={12}>
+                <AttributesItems
+                  attributes={[
+                    {
+                      name: 'Running builds count',
+                      value: dataContainer.data?.running,
+                    },
+                    {
+                      name: 'Enqueued builds count',
+                      value: dataContainer.data?.enqueued,
+                    },
+                    {
+                      name: 'Waiting for dependencies builds count',
+                      value: dataContainer.data?.waitingForDependencies,
+                    },
+                  ]}
+                />
+              </GridItem>
+              <GridItem span={4}>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    refreshBuildCounts();
+                    restartInterval();
+                  }}
+                >
+                  Refresh ({secondsUntilReload} s)
+                </Button>
+              </GridItem>
+            </Grid>
+          </CardSection>
         </FlexItem>
         <FlexItem>
           <Form isHorizontal>
