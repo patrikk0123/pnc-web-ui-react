@@ -24,7 +24,10 @@ const repositoryTypeValues: TargetRepository['repositoryType'][] = [
 ];
 
 interface IExtendedArtifact extends Artifact {
+  'targetRepository.identifier': any;
   'targetRepository.repositoryType': any;
+  'targetRepository.temporaryRepo': any;
+  'targetRepository.repositoryPath': any;
   'product.name': any;
   'productMilestone.version': any;
   build: Build;
@@ -65,6 +68,10 @@ export const artifactEntityAttributes = {
       operator: '=like=',
     },
   },
+  'targetRepository.identifier': {
+    id: 'targetRepository.identifier',
+    title: 'Identifier',
+  },
   'targetRepository.repositoryType': {
     id: 'targetRepository.repositoryType',
     title: 'Repository Type',
@@ -72,6 +79,14 @@ export const artifactEntityAttributes = {
     filter: {
       operator: '==',
     },
+  },
+  'targetRepository.temporaryRepo': {
+    id: 'targetRepository.temporaryRepo',
+    title: 'Temporary',
+  },
+  'targetRepository.repositoryPath': {
+    id: 'targetRepository.repositoryPath',
+    title: 'Repository Path',
   },
   md5: {
     id: 'md5',
@@ -111,5 +126,29 @@ export const artifactEntityAttributes = {
   build: {
     id: 'build',
     title: 'Build',
+  },
+  purl: {
+    id: 'purl',
+    title: 'Package URL',
+  },
+  size: {
+    id: 'size',
+    title: 'Size',
+  },
+  importDate: {
+    id: 'importDate',
+    title: 'Import Date',
+  },
+  publicUrl: {
+    id: 'publicUrl',
+    title: 'Public URL',
+  },
+  originUrl: {
+    id: 'originUrl',
+    title: 'Origin URL',
+  },
+  deployUrl: {
+    id: 'deployUrl',
+    title: 'Deploy URL',
   },
 } as const satisfies TEntityAttributes<IExtendedArtifact>;
