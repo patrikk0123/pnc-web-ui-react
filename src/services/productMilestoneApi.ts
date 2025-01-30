@@ -135,7 +135,22 @@ export const getSharedDeliveredArtifacts = (requestConfig: AxiosRequestConfig = 
 };
 
 export interface IProductMilestoneComparisonData {
-  data: { productMilestones: string[] };
+  productMilestoneIds: string[];
+}
+
+// TODO: use types from pnc-api-types once upgraded
+export interface IDeliveredArtifactInMilestones {
+  artifactIdentifierPrefix: string;
+  productMilestoneArtifacts: {
+    [key: string]: IParsedArtifact[];
+  };
+}
+
+export interface IParsedArtifact {
+  id: string;
+  artifactVersion: string;
+  type: string;
+  classifier?: string;
 }
 
 /**
@@ -146,10 +161,17 @@ export interface IProductMilestoneComparisonData {
  * @param requestConfig - Axios based request config
  */
 export const getProductMilestoneComparison = (
-  { data }: IProductMilestoneComparisonData,
+  { productMilestoneIds }: IProductMilestoneComparisonData,
   requestConfig: AxiosRequestConfig = {}
 ) => {
-  return pncApiMocksClient.getHttpClient().post<any>(`/product-milestone-comparison`, data, requestConfig);
+  const productMilestoneIdsQuery = productMilestoneIds.map((id) => `milestoneIds=${id}`).join('&');
+
+  return pncClient
+    .getHttpClient()
+    .get<IDeliveredArtifactInMilestones[]>(
+      `/product-milestones/comparisons/delivered-artifacts?${productMilestoneIdsQuery}`,
+      requestConfig
+    );
 };
 
 /**
