@@ -177,7 +177,12 @@ export const BuildConfigPages = ({ componentIdBuildHistory = 'bh1' }: IBuildConf
         tabs={pageTabs}
         actions={[
           <ProtectedBuildStartButton key="build-start-button" buildConfig={serviceContainerBuildConfig.data!} />,
-          <BuildConfigCloneModalButton key="config-clone-button" toggleModal={toggleCloneModal} variant="detail" />,
+          <BuildConfigCloneModalButton
+            key="config-clone-button"
+            toggleModal={toggleCloneModal}
+            variant="detail"
+            buildConfig={serviceContainerBuildConfig.data!}
+          />,
           <ProtectedActionButton key="edit-config-button" variant="primary" link="edit">
             Edit Build Config
           </ProtectedActionButton>,

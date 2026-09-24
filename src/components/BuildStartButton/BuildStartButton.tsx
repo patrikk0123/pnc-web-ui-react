@@ -16,6 +16,8 @@ import { TooltipWrapper } from 'components/TooltipWrapper/TooltipWrapper';
 import * as buildConfigApi from 'services/buildConfigApi';
 import * as groupConfigApi from 'services/groupConfigApi';
 
+import { SERVICE_BUILD_CATEGORY } from 'utils/features';
+
 import styles from './BuildStartButton.module.css';
 
 interface IParamOption {
@@ -156,6 +158,12 @@ export const BuildStartButton = ({
 
   const serviceContainer = buildConfig ? serviceContainerBuildStart : serviceContainerGroupBuildStart;
 
+  const isServiceBuildCategoryDisabled =
+    buildConfig?.parameters?.BUILD_CATEGORY === 'SERVICE' && !SERVICE_BUILD_CATEGORY.isEnabled;
+  const isButtonDisabled = isDisabled || isServiceBuildCategoryDisabled;
+  const buttonDisabledTooltip =
+    disabledTooltip || (isServiceBuildCategoryDisabled ? SERVICE_BUILD_CATEGORY.disabledReason : undefined);
+
   const params: buildConfigApi.IBuildStartParams | groupConfigApi.IGroupBuildStartParams = {
     id: '',
     temporaryBuild: false,
@@ -190,7 +198,7 @@ export const BuildStartButton = ({
       <Dropdown
         popperProps={dropdownPopperProps}
         toggle={(toggleRef) => (
-          <TooltipWrapper tooltip={disabledTooltip}>
+          <TooltipWrapper tooltip={buttonDisabledTooltip}>
             <div>
               <MenuToggle
                 ref={toggleRef}
@@ -198,7 +206,7 @@ export const BuildStartButton = ({
                 onClick={() => setIsDropdownOpen((isDropdownOpen) => !isDropdownOpen)}
                 isExpanded={isDropdownOpen}
                 size="sm"
-                isDisabled={isDisabled}
+                isDisabled={isButtonDisabled}
                 splitButtonItems={[
                   <ProgressButton
                     key="build-button"
@@ -207,7 +215,7 @@ export const BuildStartButton = ({
                     icon={<BuildIcon />}
                     isSmall
                     className={styles['build-button']}
-                    isDisabled={isDisabled}
+                    isDisabled={isButtonDisabled}
                   >
                     Build
                   </ProgressButton>,

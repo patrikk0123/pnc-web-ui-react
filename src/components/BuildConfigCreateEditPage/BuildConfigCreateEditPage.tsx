@@ -81,6 +81,7 @@ import * as projectApi from 'services/projectApi';
 import * as scmRepositoryApi from 'services/scmRepositoryApi';
 import { uiLogger } from 'services/uiLogger';
 
+import { SERVICE_BUILD_CATEGORY } from 'utils/features';
 import { maxLengthValidator, validateBuildScript, validateScmUrl } from 'utils/formValidationHelpers';
 import { createSafePatch } from 'utils/patchHelper';
 import { generatePageTitle } from 'utils/titleHelper';
@@ -1009,9 +1010,17 @@ export const BuildConfigCreateEditPage = ({ isEditPage = false }: IBuildConfigCr
                         placeholder="Select Build category"
                         onBlur={rest.onBlur}
                       >
-                        {buildParametersBuildCategoryValues?.map((buildCategoryItem) => (
-                          <SelectOption key={buildCategoryItem} option={buildCategoryItem} />
-                        ))}
+                        {buildParametersBuildCategoryValues?.map((buildCategoryItem) => {
+                          const isBuildCategoryDisabled = buildCategoryItem === 'SERVICE' && !SERVICE_BUILD_CATEGORY.isEnabled;
+                          return (
+                            <SelectOption
+                              key={buildCategoryItem}
+                              option={buildCategoryItem}
+                              isDisabled={isBuildCategoryDisabled}
+                              description={isBuildCategoryDisabled ? SERVICE_BUILD_CATEGORY.disabledReason : undefined}
+                            />
+                          );
+                        })}
                       </Select>
                     ) : (
                       <TextArea
