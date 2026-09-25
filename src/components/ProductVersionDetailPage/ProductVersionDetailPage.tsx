@@ -18,6 +18,7 @@ import { CardTitle } from 'components/CardFlex/CardTitle';
 import { CardValue } from 'components/CardFlex/CardValue';
 import { StackedBarChart } from 'components/Charts/StackedBarChart';
 import { ContentBox } from 'components/ContentBox/ContentBox';
+import { EmptyStateSymbol } from 'components/EmptyStateSymbol/EmptyStateSymbol';
 import { PageSectionHeader } from 'components/PageSectionHeader/PageSectionHeader';
 import { Pagination } from 'components/Pagination/Pagination';
 import { ProductMilestoneReleaseLabel } from 'components/ProductMilestoneReleaseLabel/ProductMilestoneReleaseLabel';
@@ -25,10 +26,12 @@ import { useServiceContainerProductVersion } from 'components/ProductVersionPage
 import { ServiceContainerLoading } from 'components/ServiceContainers/ServiceContainerLoading';
 import { Toolbar } from 'components/Toolbar/Toolbar';
 import { ToolbarItem } from 'components/Toolbar/ToolbarItem';
+import { TooltipWrapper } from 'components/TooltipWrapper/TooltipWrapper';
 
 import * as productVersionApi from 'services/productVersionApi';
 
 import { stackedBarChartDataTransform, stackedBarChartHeight, stackedBarChartLabelTransform } from 'utils/dataTransformHelper';
+import { BREW } from 'utils/features';
 
 export const ProductVersionDetailPage = () => {
   const { productVersionId } = useParamsRequired();
@@ -124,7 +127,19 @@ export const ProductVersionDetailPage = () => {
               {serviceContainerProductVersion.data?.product?.description}
             </AttributesItem>
             <AttributesItem title={productVersionEntityAttributes['attributes.brewTagPrefix'].title}>
-              {serviceContainerProductVersion.data?.attributes?.BREW_TAG_PREFIX}
+              {BREW.isEnabled ? (
+                serviceContainerProductVersion.data?.attributes?.BREW_TAG_PREFIX
+              ) : (
+                <TooltipWrapper tooltip={BREW.disabledReason}>
+                  <EmptyStateSymbol
+                    text={`Disabled${
+                      serviceContainerProductVersion.data?.attributes?.BREW_TAG_PREFIX
+                        ? ` (original value: ${serviceContainerProductVersion.data.attributes.BREW_TAG_PREFIX})`
+                        : ''
+                    }`}
+                  />
+                </TooltipWrapper>
+              )}
             </AttributesItem>
             <AttributesItem title={productVersionEntityAttributes.currentProductMilestone.title}>
               {serviceContainerProductVersion.data?.currentProductMilestone?.id && (
